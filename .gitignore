@@ -1,0 +1,4 @@
+node_modules/
+notebook_data/
+config/config.json
+!config/config.json.sample
