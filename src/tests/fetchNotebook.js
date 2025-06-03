@@ -8,10 +8,6 @@ async function main() {
 
     await client.initialize();
 
-    // Check available notebooks to find the notebook ID
-    // const notebooks = await client._getNotebooks();
-    // console.log('Available notebooks:', notebooks);
-
     // Create output directory if it doesn't exist
     const outputDir = path.join(__dirname, '../../notebook_data');
     await fs.mkdir(outputDir, { recursive: true });
@@ -19,7 +15,7 @@ async function main() {
     // // Get sections
     const sections = await client.getSections();
     console.log(`Found ${sections.length} sections in the notebook`);
-    
+
     // // List pages in each section
     for (const section of sections) {
         const sectionInfo = {'section': section, 'pages': []};
