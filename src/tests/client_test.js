@@ -13,21 +13,21 @@ async function main() {
     // console.log('Available notebooks:', notebooks);
 
     // Create output directory if it doesn't exist
-    const outputDir = path.join(__dirname, '../notebook_data');
+    const outputDir = path.join(__dirname, '../../notebook_data');
     await fs.mkdir(outputDir, { recursive: true });
     
-    // Get sections
+    // // Get sections
     const sections = await client.getSections();
-    console.log('Sections:', sections);
+    console.log(`Found ${sections.length} sections in the notebook`);
     
-    // List pages in each section
+    // // List pages in each section
     for (const section of sections) {
         const sectionInfo = {'section': section, 'pages': []};
-        const pages = await client.getPages(section.id);
+        const pages = await client.getPages(section.id, 100);
         console.log(`Found ${pages.length} pages in section ${section.displayName}`);
         
         // Create safe filename from section name
-        const safeFileName = section.displayName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        const safeFileName = section.displayName.replace(/ /g, '_').toLowerCase();
         const filePath = path.join(outputDir, `${safeFileName}.json`);
 
         // Save to JSON file

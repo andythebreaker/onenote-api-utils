@@ -43,7 +43,7 @@ class OneNoteClient {
             }
 
             console.log('Token acquired successfully');
-            
+
             this.graphClient = Client.init({
                 authProvider: (done) => {
                     done(null, response.accessToken);
@@ -95,16 +95,42 @@ class OneNoteClient {
         }
     }
 
-    async getPages(sectionId) {
-        try {
-            const pages = await this.graphClient
-                .api(`/me/onenote/sections/${sectionId}/pages`)
-                .get();
-            return pages.value;
-        } catch (error) {
-            console.error('Error fetching section pages:', error);
-            throw error;
+    async getPages(sectionId, pageSize = 20) {
+        // 每次請求的頁面數量上限為100
+        if (pageSize < 0 || pageSize > 100) {
+            throw new Error("pageSize must be between 0 and 100");
         }
+        
+        let skip = 0;
+        let allPages = [];
+
+        while (true) {
+            try {
+                const response = await this.graphClient
+                    .api(`/me/onenote/sections/${sectionId}/pages`)
+                    .query({ $top: pageSize, $skip: skip })
+                    .get();
+                const pages =  response.value;
+
+                if (!pages || pages.length === 0) {
+                    break;
+                }
+
+                allPages = allPages.concat(pages);
+                if (pages.length < pageSize) {
+                    // 已取得所有頁面
+                    break;
+                }
+
+                skip += pageSize;
+
+            } catch (error) {
+                console.error('Error fetching section pages:', error);
+                throw error;
+            }
+        }
+
+        return allPages;
     }
 }
 
