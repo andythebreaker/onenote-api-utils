@@ -6,7 +6,7 @@
 到MS Azure App Registration註冊一個APP
 > 目前測試是用免費版的MS帳號也可以註冊
 
-![Azure Registered App](image.png)
+![Azure Registered App](./azure_app_registration.png)
 
 ### 設定Authentication
 設定Platform
