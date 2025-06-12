@@ -1,58 +1,31 @@
 # OneNote API Utils
 
-A utility for automatically fetching OneNote data at regular intervals.
+透過MS graph和Azure registered app來fetch OneNote筆記本資料
 
-## Features
+## Azure App Registration
+到MS Azure App Registration註冊一個APP
+> 目前測試是用免費版的MS帳號也可以註冊
 
-- Authenticate with Microsoft Graph API using device code flow
-- Automatically refresh authentication tokens
-- Fetch OneNote notebook sections and pages
-- Save data as JSON files
-- Automatically poll for updates every 5 minutes
-- No user interaction required after initial authentication
+![Azure Registered App](./azure_app_registration.png)
 
-## Setup
+### 設定Authentication
+設定Platform
+1. 選擇 Mobile and desktop applications
+2. 勾選`https://login.microsoftonline.com/common/oauth2/nativeclient`
 
-1. Clone this repository
-2. Install dependencies:
-   ```
-   npm install
-   ```
-3. Configure your OneNote settings in `config/config.json`:
-   ```json
-   {
-     "notebookId": "your-notebook-id",
-     "clientId": "your-client-id",
-     "tenantId": "your-tenant-id"
-   }
-   ```
+允許public client flows
+> 這個不打開請求token時會有error
+
+### 設定API Permission
+至少要勾選MS Graph的`User.Read`和`Notes.Read`，才可以登陸拿token然後讀取Onenote筆記本資料
+
+
+## Config檔設定
+1. 把`config.json.sample`複製或改名為`config.json`
+2. 到剛剛在MS Azure App Registration註冊的APP總攬(overview)頁面找Application (client) ID，然後把找到的ID複製到`config.json`中對應`clientId`的value
+> 實測只需要`clientId`，使用`tenantId`的登入方式會有一些問題這裡不使用
 
 ## Usage
-
-Run the client test script:
-
-```
-node src/tests/client_test.js
-```
-
-The first time you run the program:
-1. You'll be prompted to visit a URL and enter a code
-2. After authentication, the program will fetch your OneNote data
-3. The program will continue running, automatically fetching data every 5 minutes
-4. Data is saved to JSON files in the `src/notebook_data` directory
-
-To stop the program, press `Ctrl+C`.
-
-## How It Works
-
-- The program uses MSAL.js with the device code flow for initial authentication
-- It requests the `offline_access` scope to obtain refresh tokens
-- MSAL internally manages refreshing tokens when they expire
-- The program maintains a persistent connection to the Microsoft Graph API
-- Every 5 minutes, it automatically fetches the latest data from your notebook
-
-## Requirements
-
-- Node.js 14 or later
-- Microsoft 365 account with OneNote access
-- Registered Azure AD application with appropriate permissions
+1. 執行`node ./src/tests/listNotebooks.js`列出筆記本
+2. 找出欲讀取筆記本的ID貼至`config.json`中對應`notebookId`的value
+3. 執行`node ./src/tests/fetchNotebook.js`讀取筆記本內容，並將對應的章節內容儲存至`./notebook_data/`中
