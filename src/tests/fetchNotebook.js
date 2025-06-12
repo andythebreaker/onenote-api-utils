@@ -21,13 +21,13 @@ async function fetchAndSaveData(client) {
         console.log(`\n[${getTimestamp()}] Fetching data...`);
 
         // Create output directory if it doesn't exist
-        const outputDir = path.join(__dirname, '../notebook_data');
+        const outputDir = path.join(__dirname, '../../notebook_data');
         await fs.mkdir(outputDir, { recursive: true });
 
-        const assetsDir = path.join(__dirname, '../assets/images', client.config.notebookId);
+        const assetsDir = path.join(__dirname, '../../assets/images', client.config.notebookId);
         await fs.mkdir(assetsDir, { recursive: true });
 
-        const imgHashPath = path.join(__dirname, '../notebook_data/imgHash.json');
+        const imgHashPath = path.join(__dirname, '../../notebook_data/imgHash.json');
         let imgHash = [];
         try {
             const d = await fs.readFile(imgHashPath, 'utf8');
