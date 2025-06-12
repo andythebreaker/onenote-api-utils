@@ -39,6 +39,6 @@
 | Token 儲存與刷新邏輯 | 有完整實作，支援 token 過期自動更新 | 無 token 更新邏輯，只使用初次取得的 access token |
 | Scopes | 包含 `offline_access` | 缺少 `offline_access` |
 | `graphClient` `authProvider` | 使用 async 函式並支援自動 refresh | 使用一次性 `accessToken` |
-| 頁面讀取邏輯 (`getPages`) | 單次請求全部頁面 | 加入分頁查詢邏輯 (`$top`, `$skip`) 且限制 `pageSize` |
+| 頁面讀取邏輯 (`getPages`) | 加入分頁查詢邏輯 (`$top`, `$skip`) 且限制 `pageSize` | 單次請求全部頁面 |
 | 結構與維護性 | 更模組化，支援 token 再利用 | 較簡單，但缺乏完整的使用者登入週期處理 |
 | 可用性與擴充性 | 更符合實際應用需求，支援長期 session 使用 | 適合單次存取需求，較為簡化 |
