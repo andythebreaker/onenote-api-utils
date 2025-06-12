@@ -31,3 +31,7 @@
 1. 執行`node ./src/tests/listNotebooks.js`列出筆記本
 2. 找出欲讀取筆記本的ID後，設定至`ONENOTE_NOTEBOOK_ID`環境變數
 3. 執行`node ./src/tests/fetchNotebook.js [--min N]`讀取筆記本內容，並將對應的章節內容儲存至`./notebook_data/`中 (N 為間隔分鐘，0 表示僅執行一次，預設 5 分鐘)
+
+## 資料格式的參考
+
+可以去看`./document_example_of_input_and_output_format`這個資料夾裡面的各種檔案，這是我真實去跑一次生成的資料，只是把他從原本的地方移過來放著。供參考。
