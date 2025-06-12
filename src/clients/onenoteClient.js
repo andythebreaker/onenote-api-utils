@@ -174,6 +174,20 @@ class OneNoteClient {
 
         return allPages;
     }
+
+    async getPageContent(pageId) {
+        try {
+            const content = await this.graphClient
+                .api(`/me/onenote/pages/${pageId}/content`)
+                .header('Accept', 'text/html')
+                .responseType('text')
+                .get();
+            return content;
+        } catch (error) {
+            console.error('Error fetching page content:', error);
+            throw error;
+        }
+    }
 }
 
 module.exports = OneNoteClient;
