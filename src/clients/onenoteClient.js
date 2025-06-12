@@ -3,11 +3,18 @@ const { Client } = require('@microsoft/microsoft-graph-client');
 require('isomorphic-fetch');
 
 class OneNoteClient {
-    constructor(config) {
-        this.config = config;
+    constructor(config = {}) {
+        this.config = {
+            notebookId: config.notebookId || process.env.ONENOTE_NOTEBOOK_ID,
+            clientId: config.clientId || process.env.ONENOTE_CLIENT_ID,
+            tenantId: config.tenantId || process.env.ONENOTE_TENANT_ID,
+        };
+        if (!this.config.clientId) {
+            throw new Error('ONENOTE_CLIENT_ID environment variable is required');
+        }
         this.pca = new PublicClientApplication({
             auth: {
-                clientId: config.clientId,
+                clientId: this.config.clientId,
                 authority: `https://login.microsoftonline.com/common`,
             },
             system: {

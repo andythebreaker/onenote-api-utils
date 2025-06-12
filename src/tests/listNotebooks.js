@@ -1,5 +1,5 @@
 const OneNoteClient = require('../clients/onenoteClient');
-const config = require('../../config/config.json');
+const config = require('../config');
 
 async function main() {
     const client = new OneNoteClient(config);
