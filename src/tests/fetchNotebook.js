@@ -1,5 +1,5 @@
 const OneNoteClient = require('../clients/onenoteClient');
-const config = require('../../config/config.json');
+const config = require('../config');
 const fs = require('fs/promises');
 const path = require('path');
 

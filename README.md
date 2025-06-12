@@ -20,14 +20,16 @@
 至少要勾選MS Graph的`User.Read`和`Notes.Read`，才可以登陸拿token然後讀取Onenote筆記本資料
 
 
-## Config檔設定
-1. 把`config.json.sample`複製或改名為`config.json`
-2. 到剛剛在MS Azure App Registration註冊的APP總攬(overview)頁面找Application (client) ID，然後把找到的ID複製到`config.json`中對應`clientId`的value
-> 實測只需要`clientId`，使用`tenantId`的登入方式會有一些問題這裡不使用
+## 環境變數設定
+在執行範例程式前，請設定下列環境變數：
+
+* `ONENOTE_CLIENT_ID`：Azure App Registration 取得的 Application (client) ID
+* `ONENOTE_NOTEBOOK_ID`：欲讀取的筆記本 ID
+* `ONENOTE_TENANT_ID`：Tenant ID，選填，預設使用 common
 
 ## Usage
 1. 執行`node ./src/tests/listNotebooks.js`列出筆記本
-2. 找出欲讀取筆記本的ID貼至`config.json`中對應`notebookId`的value
+2. 找出欲讀取筆記本的ID後，設定至`ONENOTE_NOTEBOOK_ID`環境變數
 3. 執行`node ./src/tests/fetchNotebook.js`讀取筆記本內容，並將對應的章節內容儲存至`./notebook_data/`中
 
 ## 主要差異摘要
