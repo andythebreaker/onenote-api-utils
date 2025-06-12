@@ -12,6 +12,7 @@
   "dependencies": {
     "@azure/msal-node": "^3.5.3",
     "@microsoft/microsoft-graph-client": "^3.0.7",
-    "isomorphic-fetch": "^3.0.0"
+    "isomorphic-fetch": "^3.0.0",
+    "jsdom": "^24.1.3"
   }
 }

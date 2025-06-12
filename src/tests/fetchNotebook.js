@@ -2,6 +2,8 @@ const OneNoteClient = require('../clients/onenoteClient');
 const config = require('../config');
 const fs = require('fs/promises');
 const path = require('path');
+const { JSDOM } = require('jsdom');
+const crypto = require('crypto');
 
 // Helper function to sleep for a specified number of milliseconds
 function sleep(ms) {
@@ -17,31 +19,88 @@ function getTimestamp() {
 async function fetchAndSaveData(client) {
     try {
         console.log(`\n[${getTimestamp()}] Fetching data...`);
-        
+
         // Create output directory if it doesn't exist
         const outputDir = path.join(__dirname, '../notebook_data');
         await fs.mkdir(outputDir, { recursive: true });
-        
+
+        const assetsDir = path.join(__dirname, '../assets/images', client.config.notebookId);
+        await fs.mkdir(assetsDir, { recursive: true });
+
+        const imgHashPath = path.join(__dirname, '../notebook_data/imgHash.json');
+        let imgHash = [];
+        try {
+            const d = await fs.readFile(imgHashPath, 'utf8');
+            imgHash = JSON.parse(d);
+        } catch (e) {
+            imgHash = [];
+        }
+
+        const updateImgHash = async (entry) => {
+            if (!imgHash.find(h => h.id === entry.id)) {
+                imgHash.push(entry);
+                await fs.writeFile(imgHashPath, JSON.stringify(imgHash, null, 2));
+            }
+        };
+
         // Get sections
         const sections = await client.getSections();
         console.log(`[${getTimestamp()}] Found ${sections.length} sections`);
-        
-        // List pages in each section
+
+        const notebookData = [];
+
         for (const section of sections) {
-            const sectionInfo = {'section': section, 'pages': []};
+            const sectionContent = { sectionInfo: section, sectionPages: [] };
             const pages = await client.getPages(section.id);
             console.log(`[${getTimestamp()}] Found ${pages.length} pages in section "${section.displayName}"`);
-            
-            // Create safe filename from section name
-            const safeFileName = section.displayName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-            const filePath = path.join(outputDir, `${safeFileName}.json`);
 
-            // Save to JSON file
-            sectionInfo.pages = pages;
-            await fs.writeFile(filePath, JSON.stringify(sectionInfo, null, 2));
-            console.log(`[${getTimestamp()}] Saved pages from "${section.displayName}" to ${filePath}`);        
+            for (const page of pages) {
+                try {
+                    let pageBody = await client.getPageContent(page.id);
+                    const dom = new JSDOM(pageBody);
+                    const images = dom.window.document.querySelectorAll('img');
+
+                    const downloads = [];
+
+                    images.forEach((img, index) => {
+                        const src = img.src;
+                        const id = crypto.createHash('sha256').update(src).digest('hex');
+                        const safeName = `${section.displayName}_${page.title}_${index}`.replace(/[/\\\s]/g, '_') + '.jpg';
+                        const filePath = path.join(assetsDir, safeName);
+
+                        // download if not exists
+                        const download = async () => {
+                            try {
+                                await fs.access(filePath);
+                            } catch {
+                                const buffer = await client.graphClient.api(src).responseType('arraybuffer').get();
+                                await fs.writeFile(filePath, Buffer.from(buffer));
+                            }
+                        };
+
+                        downloads.push(download());
+
+                        const localPath = path.join('/assets/images', client.config.notebookId, safeName);
+                        img.src = localPath;
+                        updateImgHash({ id, path: localPath });
+                    });
+
+                    await Promise.all(downloads);
+
+                    pageBody = dom.serialize();
+                    sectionContent.sectionPages.push({ pageInfo: page, pageBody });
+                } catch (err) {
+                    console.error(`[${getTimestamp()}] Failed to fetch page content:`, err.message);
+                }
+            }
+
+            notebookData.push(sectionContent);
         }
-        
+
+        const cacheFile = path.join(outputDir, `${client.config.notebookId}.json`);
+        await fs.writeFile(cacheFile, JSON.stringify(notebookData, null, 2));
+        console.log(`[${getTimestamp()}] Saved notebook cache to ${cacheFile}`);
+
         console.log(`[${getTimestamp()}] Data fetch completed successfully`);
         return true;
     } catch (error) {
