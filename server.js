@@ -11,7 +11,7 @@ app.set('views', path.join(__dirname, 'views'));
 
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
-app.get('/test', (req, res) => {
+app.get('/', (req, res) => {
   const notebookId = NOTEBOOK_ID || req.query.notebookId;
   if (!notebookId) {
     return res.status(400).send('ONENOTE_NOTEBOOK_ID not set');
