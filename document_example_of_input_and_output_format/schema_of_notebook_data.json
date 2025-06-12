@@ -1,0 +1,262 @@
+{
+  "type": "array",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "",
+  "minItems": 1,
+  "uniqueItems": true,
+  "items": {
+    "type": "object",
+    "required": [
+      "sectionInfo",
+      "sectionPages"
+    ],
+    "properties": {
+      "sectionInfo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "self": {
+            "type": "string",
+            "minLength": 1
+          },
+          "createdDateTime": {
+            "type": "string",
+            "minLength": 1
+          },
+          "displayName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "lastModifiedDateTime": {
+            "type": "string",
+            "minLength": 1
+          },
+          "isDefault": {
+            "type": "boolean"
+          },
+          "pagesUrl": {
+            "type": "string",
+            "minLength": 1
+          },
+          "createdBy": {
+            "type": "object",
+            "properties": {
+              "user": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "displayName": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "id",
+                  "displayName"
+                ]
+              }
+            },
+            "required": [
+              "user"
+            ]
+          },
+          "lastModifiedBy": {
+            "type": "object",
+            "properties": {
+              "user": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "displayName": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "id",
+                  "displayName"
+                ]
+              }
+            },
+            "required": [
+              "user"
+            ]
+          },
+          "parentNotebook@odata.context": {
+            "type": "string",
+            "minLength": 1
+          },
+          "parentNotebook": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "displayName": {
+                "type": "string",
+                "minLength": 1
+              },
+              "self": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "id",
+              "displayName",
+              "self"
+            ]
+          },
+          "parentSectionGroup@odata.context": {
+            "type": "string",
+            "minLength": 1
+          },
+          "parentSectionGroup": {}
+        },
+        "required": [
+          "id",
+          "self",
+          "createdDateTime",
+          "displayName",
+          "lastModifiedDateTime",
+          "isDefault",
+          "pagesUrl",
+          "createdBy",
+          "lastModifiedBy",
+          "parentNotebook@odata.context",
+          "parentNotebook",
+          "parentSectionGroup@odata.context"
+        ]
+      },
+      "sectionPages": {
+        "type": "array",
+        "uniqueItems": true,
+        "minItems": 1,
+        "items": {
+          "required": [
+            "pageBody"
+          ],
+          "properties": {
+            "pageInfo": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "self": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "createdDateTime": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "title": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "createdByAppId": {
+                  "type": "string"
+                },
+                "contentUrl": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "lastModifiedDateTime": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "links": {
+                  "type": "object",
+                  "properties": {
+                    "oneNoteClientUrl": {
+                      "type": "object",
+                      "properties": {
+                        "href": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      },
+                      "required": [
+                        "href"
+                      ]
+                    },
+                    "oneNoteWebUrl": {
+                      "type": "object",
+                      "properties": {
+                        "href": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      },
+                      "required": [
+                        "href"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "oneNoteClientUrl",
+                    "oneNoteWebUrl"
+                  ]
+                },
+                "parentSection@odata.context": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "parentSection": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "displayName": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "self": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "displayName",
+                    "self"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "self",
+                "createdDateTime",
+                "title",
+                "createdByAppId",
+                "contentUrl",
+                "lastModifiedDateTime",
+                "links",
+                "parentSection@odata.context",
+                "parentSection"
+              ]
+            },
+            "pageBody": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    }
+  }
+}
