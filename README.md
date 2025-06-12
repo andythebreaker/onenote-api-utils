@@ -32,6 +32,7 @@
 2. 找出欲讀取筆記本的ID後，設定至`ONENOTE_NOTEBOOK_ID`環境變數
 3. 執行`node ./src/tests/fetchNotebook.js [--min N]`讀取筆記本內容，並將對應的章節內容儲存至`./notebook_data/`中 (N 為間隔分鐘，0 表示僅執行一次，預設 5 分鐘)
 4. 執行`npm run serv`啟動簡易瀏覽伺服器，於瀏覽器開啟 `http://localhost:3000` 查看筆記內容
+5. 如需產生靜態網頁，執行`npm run build`，產生的網站會在`./dist`目錄中
 
 ## 資料格式的參考
 
