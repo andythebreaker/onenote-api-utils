@@ -52,29 +52,51 @@ async function fetchAndSaveData(client) {
 
 async function main() {
     console.log(`[${getTimestamp()}] OneNote API utility starting...`);
-    
+
+    // Parse command line argument for interval minutes
+    let intervalMin = 5;
+    const args = process.argv.slice(2);
+    for (let i = 0; i < args.length; i++) {
+        const arg = args[i];
+        if (arg === '--min' && i + 1 < args.length) {
+            intervalMin = parseInt(args[i + 1], 10);
+            i++;
+        } else if (arg.startsWith('--min=')) {
+            intervalMin = parseInt(arg.split('=')[1], 10);
+        } else if (/^\d+$/.test(arg)) {
+            intervalMin = parseInt(arg, 10);
+        }
+    }
+
+    if (!Number.isFinite(intervalMin) || intervalMin < 0) {
+        console.log(`[${getTimestamp()}] Invalid min value, defaulting to 5`);
+        intervalMin = 5;
+    }
+
     try {
         // Initialize the client and authenticate
         const client = new OneNoteClient(config);
         await client.initialize();
         console.log(`[${getTimestamp()}] Authentication successful`);
-        
+
         // Initial data fetch
         await fetchAndSaveData(client);
-        
-        // Enter infinite loop to fetch data every 5 minutes
-        console.log(`\n[${getTimestamp()}] Entering polling loop - will fetch data every 5 minutes`);
+
+        if (intervalMin === 0) {
+            console.log(`[${getTimestamp()}] min set to 0 - fetch once and exit`);
+            return;
+        }
+
+        // Enter loop to fetch data periodically
+        console.log(`\n[${getTimestamp()}] Entering polling loop - will fetch data every ${intervalMin} minutes`);
         console.log(`[${getTimestamp()}] Press Ctrl+C to stop the process`);
-        
+
         while (true) {
-            // Calculate time for next fetch (5 minutes)
-            const nextFetchTime = new Date(Date.now() + 5 * 60 * 1000);
+            const nextFetchTime = new Date(Date.now() + intervalMin * 60 * 1000);
             console.log(`\n[${getTimestamp()}] Next fetch scheduled at ${nextFetchTime.toLocaleTimeString()}`);
-            
-            // Sleep for 5 minutes (300,000 milliseconds)
-            await sleep(5 * 60 * 1000);
-            
-            // Fetch data again
+
+            await sleep(intervalMin * 60 * 1000);
+
             await fetchAndSaveData(client);
         }
     } catch (error) {
