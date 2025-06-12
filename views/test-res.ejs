@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>OneNote Notebook Content</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui/dist/semantic.min.css">
+</head>
+<body>
+  <div class="ui grid">
+    <div class="four wide column">
+      <ul>
+        <% sectionCollection.forEach(function(section, sIndex){ %>
+          <li>
+            <h3><%= section.sectionInfo.displayName || section.sectionInfo.name %></h3>
+            <ul>
+              <% section.sectionPages.forEach(function(page, pIndex){ %>
+                <li>
+                  <a href="#" data-section="<%= sIndex %>" data-page="<%= pIndex %>"><%= page.pageInfo.title %></a>
+                </li>
+              <% }) %>
+            </ul>
+          </li>
+        <% }) %>
+      </ul>
+    </div>
+    <div class="twelve wide column">
+      <div class="ui segment">
+        <h2>Page Content</h2>
+        <div id="pageContent"><%- firstPageContent %></div>
+      </div>
+    </div>
+  </div>
+  <script>
+  const sectionCollection = <%- JSON.stringify(sectionCollection) %>;
+  document.addEventListener('DOMContentLoaded', function(){
+    const links = document.querySelectorAll('a[data-section][data-page]');
+    links.forEach(function(link){
+      link.addEventListener('click', function(ev){
+        ev.preventDefault();
+        const s = this.getAttribute('data-section');
+        const p = this.getAttribute('data-page');
+        const html = sectionCollection[s].sectionPages[p].pageBody;
+        document.getElementById('pageContent').innerHTML = html;
+      });
+    });
+  });
+  </script>
+</body>
+</html>
