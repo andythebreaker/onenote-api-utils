@@ -1,0 +1,44 @@
+extends layout
+
+block content
+  style.
+    section:last-of-type {
+      margin-bottom: 40px;
+    }
+    .bsk-container {
+      margin-top: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh; /* Adjust as needed */
+    }
+
+    .x-icon {
+      height: 1em;
+      width: 1em;
+      top: .125em;
+      position: relative;
+    }
+    .x-alt {
+      color: #777;
+    }
+
+  h1.ui.center.aligned.header= title
+  form(id="createExamples" name="createExamples", method="post")
+    button#domainx(type="submit", name="submit", value="x") 一般使用者進入檢視「開發期間試用版」
+  section
+    .ui.center.aligned.container
+      .bsk-container
+        if DEV
+          img(src="/images/ban.png", alt="Banner Image")
+        else
+          img(src='/' + PORT + '.php/images/ban.png', alt="Banner Image")
+        p Sign in with Microsoft 「管理員登入」
+        button.ui.button.massive(type="button", id="loginBtn")
+  script.
+    window.authUrl = '!{authUrl}';
+  if DEV
+    script(src="/javascripts/index.js")
+  else
+    script(src='/' + PORT + '.php/javascripts/index.js')

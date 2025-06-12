@@ -1,0 +1,16 @@
+extends layout
+
+block content
+  h1= title
+  form(method="post")
+    input(type="text", name="notebookId", placeholder="Enter Notebook ID")
+    button(type="submit") Get Notebook Content
+  div 
+    form#notebookForm(method="post")
+      input(type="hidden" name="notebookId" value="0-56CE32FBA64785CA!s8b94d9a4e33f42d0bac3dad4d483022c")
+      button(type="button" onclick="submitForm()") Get DEFAULT Notebook Content
+
+  script.
+    function submitForm() {
+      document.getElementById('notebookForm').submit();
+    }

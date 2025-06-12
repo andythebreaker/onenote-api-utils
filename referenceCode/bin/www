@@ -1,0 +1,28 @@
+// #!/usr/bin/env node
+import debug from 'debug';
+import https from 'https';
+import fs from 'fs';
+import app from '../app.js';
+
+// Load environment variables from .env file
+import ENV from '../lib/envar.js';
+
+const debugInstance = debug('onenote-nodejs-sample');
+
+app.set('port', ENV.PORT);
+
+if (ENV.HTTPS) {
+	const options = {
+		key: fs.readFileSync('key.pem'),
+		cert: fs.readFileSync('cert.pem')
+	};
+
+	const server = https.createServer(options, app).listen(app.get('port'), function () {
+		debugInstance('Express HTTPS server listening on port ' + server.address().port);
+	});
+} else {
+	var server = app.listen(app.get('port'), function () {
+		debug('Express server listening on port ' + server.address().port);
+	});
+}
+

@@ -1,0 +1,256 @@
+extends layout
+
+block content
+  div.ui.visible.message
+    table 
+      tr 
+        td 
+          p= title 
+        td 
+          button.ui.button(onclick="var tmp = JSON.parse(atob(window.location.hash.slice(1)));window.location.hash = btoa(JSON.stringify({status:'clone',l1: tmp.l1, l2: tmp.l2,currentL1:tmp.currentL1,currentL2:tmp.currentL2}));") clone mode
+        td 
+          button.ui.button(onclick="var tmp = JSON.parse(atob(window.location.hash.slice(1)));window.location.hash = btoa(JSON.stringify({status:'look',l1: tmp.l1, l2: tmp.l2,currentL1:tmp.currentL1,currentL2:tmp.currentL2}));") view mode
+  div.ui.placeholder.segment
+    div.ui.two.column.stackable.center.aligned.grid
+      div.ui.vertical.divider ｜
+      div.middle.aligned.row
+        div.column
+          div#btonX.ui.button sectionsUrl 「回主選單」
+          div#btonY.ui.button sectionGroupsUrl
+          div#l1.ui.relaxed.divided.list
+          div.ui.piled.segment
+            div#ttp.ui.top.attached.label root
+            div.ui.button(onclick="$('#ccc').modal('show');") Toggle JSON Viewer
+            div#ccc.ui.modal
+              i.close.icon
+              div.header JSON Viewer
+              div.content
+                div#json-viewer(style="text-align: left;")
+        div.column
+          div.ui.piled.segment(style="text-align: left;")
+            iframe#noteBookPage(style="width:100%; height:100vh;")
+  pre#rrr(style="display: none;") #{body}
+  script(src="https://cdn.jsdelivr.net/npm/@textea/json-viewer@3")
+  script.    
+    var jsonViewer = new JsonViewer({
+        value: JSON.parse(document.getElementById('rrr').textContent),
+    });
+    jsonViewer.render('#json-viewer');
+    try {
+        console.log(JSON.parse(atob(window.location.hash)));
+    } catch (safeError) {
+        window.location.hash = btoa(JSON.stringify({ status: "look", currentL1: 2, currentL2:0 }));//TODO start @ diff.~
+    }
+
+
+    const targetNode = document.getElementById('json-viewer');
+    const config = { childList: true, subtree: true };
+
+    function autoNext(){
+      var tmp = JSON.parse(atob(window.location.hash.slice(1)));
+      console.log(tmp);
+      if (tmp.currentL2 === tmp.l2 - 1 && tmp.currentL1 === tmp.l1 - 1) {
+          tmp.status = "look";
+          tmp.currentL1 = 0;
+          tmp.currentL2 = 0;
+          window.location.hash = btoa(JSON.stringify({ status: tmp.status, l1: tmp.l1, l2: tmp.l2, currentL1: tmp.currentL1, currentL2: tmp.currentL2 }));
+      } else if (tmp.currentL2 === tmp.l2 - 1 && tmp.currentL1 < tmp.l1) {
+          //l2=0,l1++
+          tmp.currentL1 = tmp.currentL1 + 1;
+          tmp.currentL2 = 0;
+          window.location.hash = btoa(JSON.stringify({ status: tmp.status, l1: tmp.l1, l2: tmp.l2, currentL1: tmp.currentL1, currentL2: tmp.currentL2 }));
+      } else if (tmp.currentL2 < tmp.l2 && tmp.currentL1 < tmp.l1) {
+          //l2++
+          tmp.currentL2++;
+          window.location.hash = btoa(JSON.stringify({ status: tmp.status, l1: tmp.l1, l2: tmp.l2, currentL1: tmp.currentL1, currentL2: tmp.currentL2 }));
+      } else {
+          console.log("i am idot");
+      }
+      document.getElementById('btonX').click();
+    }
+
+    const serverUrl = '!{serverUrl}';
+    function theFuckingMain(shit) {
+        try {
+            fetch(serverUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ submit: shit })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    var themainshit = [];
+                    if (data.html === undefined) {
+                        document.getElementById('ttp').innerText = 'not html page';
+                        themainshit = data.value;
+                    } else {
+                        document.getElementById('ttp').innerText = 'html page';
+                    }
+                    try {
+                        const iframe = document.getElementById('noteBookPage');
+                        iframe.contentWindow.document.open();
+                        iframe.contentWindow.document.write(data.html);
+                        iframe.contentWindow.document.close();
+                    } catch (ifNoHtml) {
+                        console.log('this page no html');
+                    }
+                    jsonViewer = new JsonViewer({
+                        value: data,
+                    });
+                    jsonViewer.render('#json-viewer');
+
+                    //WHERE DATA IS OK
+                    //var themainshit = data;//JSON.parse(document.getElementById('rrr').textContent);
+                    var aryL1 = [];
+                    var aryL2 = [];
+                    var tmp_old = JSON.parse(atob(window.location.hash.slice(1)));
+                    
+                    try {
+                        //console.log(themainshit);
+                        document.getElementById('l1').innerHTML = '';
+                        var dm= false;
+                        if((typeof themainshit === 'undefined'||themainshit.length === 0)&&JSON.parse(atob(window.location.hash.slice(1))).status === "clone"&&data.topic === "cache not found"){
+                           autoNext();
+                        }else{
+                        themainshit.forEach(ele => {
+                            dm=true;
+                            const item = document.createElement('div');
+                            item.className = 'item';
+
+                            const icon = document.createElement('i');
+                            icon.className = 'large github middle aligned icon';
+                            item.appendChild(icon);
+
+                            const content = document.createElement('div');
+                            content.className = 'content';
+
+                            const header = document.createElement('a');
+                            header.className = 'header';
+                            var aaa = ele.name;
+                            if (aaa === undefined) {
+                                aaa = ele.title;
+                                var tmp = JSON.parse(atob(window.location.hash.slice(1)));
+                                var tmp_l2 = tmp.l2;
+                                //if is undefined, then = 0
+                                if (tmp_l2 === undefined) {
+                                    tmp_l2 = 0;
+                                }
+                                tmp_l2++;
+                                window.location.hash = btoa(JSON.stringify({ status: tmp.status, l1: tmp.l1, l2: tmp_l2, currentL1: tmp.currentL1, currentL2: tmp.currentL2 }));
+                            } else {
+                                var wtf = window.location.hash.slice(1);
+                                var tmp = JSON.parse(atob(wtf));
+                                var tmp_l1 = tmp.l1;
+                                if (tmp_l1 === undefined) {
+                                    tmp_l1 = 0;
+                                }
+                                tmp_l1++;
+                                window.location.hash = btoa(JSON.stringify({ status: tmp.status, l1: tmp_l1, l2: tmp.l2, currentL1: tmp.currentL1, currentL2: tmp.currentL2 }));
+                            }
+                            header.textContent = aaa;
+                            var bbb = ele.pagesUrl;
+                            if (bbb === undefined) {
+                                bbb = ele.contentUrl;
+                                aryL2.push(ele.contentUrl);
+                            } else {
+                                aryL1.push(ele.pagesUrl);
+                            }
+                            header.setAttribute('onclick', `theFuckingMain('${bbb}')`);
+                            content.appendChild(header);
+
+                            const description = document.createElement('div');
+                            description.className = 'description';
+                            description.textContent = `createdTime: ${JSON.stringify(ele.createdTime)},  lastModifiedTime: ${JSON.stringify(ele.lastModifiedTime)}`;
+                            content.appendChild(description);
+
+                            item.appendChild(content);
+                            document.getElementById('l1').appendChild(item);
+                        });
+                    
+                        if(dm&&aryL1.length === 0){
+                          var tmp_ = JSON.parse(atob(window.location.hash.slice(1)));
+                          window.location.hash = btoa(JSON.stringify({ status: tmp_.status, l1: tmp_.l1, l2: tmp_.l2-tmp_old.l2, currentL1: tmp_.currentL1, currentL2: tmp_.currentL2 }));
+                        }else if(dm&&aryL2.length === 0){
+                          var tmp_ = JSON.parse(atob(window.location.hash.slice(1)));
+                          window.location.hash = btoa(JSON.stringify({ status: tmp_.status, l1: tmp_.l1-tmp_old.l1, l2: tmp_.l2, currentL1: tmp_.currentL1, currentL2: tmp_.currentL2 }));
+                        }else{
+                          //nothing
+                        }
+                        }
+                    } catch (errorNO2) {
+                        console.log(errorNO2);
+                    }
+
+                    if (data.html === undefined) {
+                        //'not html page';
+                        if (JSON.parse(atob(window.location.hash.slice(1))).status === "clone") {
+                            //if aryL1 is empty array
+                            if (aryL1.length === 0) {
+                                //click on l2
+                                theFuckingMain(aryL2[JSON.parse(atob(window.location.hash.slice(1))).currentL2]);
+                            } else if (aryL2.length === 0) {
+                                //click on a html
+                                theFuckingMain(aryL1[JSON.parse(atob(window.location.hash.slice(1))).currentL1]);
+                            } else {
+                                console.log("fuck the world");
+                            }
+                        }
+                    } else {
+                        //'html page';
+                        if (JSON.parse(atob(window.location.hash.slice(1))).status === "clone") {
+                            autoNext();
+                        }
+                    }
+
+
+                })
+                .catch(error => console.error('Error:', error));
+        } catch (e_urlERROR) { console.log(`Invalid URL: ${match}, ${e_urlERROR}`); }
+    }
+
+    try {
+        document.getElementById('btonX').addEventListener('click', function () {
+            theFuckingMain(JSON.parse(document.getElementById('rrr').textContent).sectionsUrl);
+        })
+    } catch (errorNO1) {
+        document.getElementById('btonX').addEventListener('click', function () {
+            console.log(errorNO1);
+        })
+    }
+    try {
+        document.getElementById('btonY').addEventListener('click', function () {
+            theFuckingMain(JSON.parse(document.getElementById('rrr').textContent).sectionGroupsUrl);
+        })
+    } catch (errorNO1) {
+        document.getElementById('btonX').addEventListener('click', function () {
+            console.log(errorNO1);
+        })
+    }
+
+    const callback = function (mutationsList, observer) {
+        for (let mutation of mutationsList) {
+            if (mutation.type === 'childList') {
+                const innerHtml = mutation.target.innerHTML;
+                const regex = /https:\/\/www\.onenote\.com\/api\/v1\.0\/[^\"]+/g;
+                const matches = innerHtml.match(regex);
+                if (matches) {
+                    matches.forEach((match) => {
+                        var theFakeButton;
+                        try {
+                            theFakeButton = mutation.target.closest('.MuiBox-root').querySelector('.data-key-key.MuiBox-root');
+                        } catch (e) { console.log("."); }
+                        if (theFakeButton) {
+                            theFakeButton.onclick = null;
+                            theFakeButton.addEventListener('click', function () {
+                                theFuckingMain(match);
+                            });
+                        }
+                    });
+                }
+            }
+        }
+    };
+    const observer = new MutationObserver(callback);
+    observer.observe(targetNode, config);

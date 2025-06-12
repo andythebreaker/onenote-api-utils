@@ -1,0 +1,33 @@
+extends layout
+
+block content
+  h1= title
+  .ui.grid
+    .four.wide.column
+      ul
+        each section, sectionIndex in sectionCollection
+          li
+            h3 #{section.sectionInfo.name}
+            ul
+              each page, pageIndex in section.sectionPages
+                li
+                  a(href='#' + page.pageInfo.id, data-section=sectionIndex, data-page=pageIndex)= page.pageInfo.title
+    .twelve.wide.column
+      .ui.segment
+        h2 Page Content
+        div#pageContent!= firstPageContent
+  script.
+    const sectionCollection = !{JSON.stringify(sectionCollection)};
+    document.addEventListener('DOMContentLoaded', function() {
+      const links = document.querySelectorAll('a[data-section][data-page]');
+      links.forEach(link => {
+        link.addEventListener('click', function(event) {
+          event.preventDefault();
+          const sectionIndex = this.getAttribute('data-section');
+          const pageIndex = this.getAttribute('data-page');
+          const pageContent = sectionCollection[sectionIndex].sectionPages[pageIndex].pageBody;
+          document.getElementById('pageContent').innerHTML = pageContent;
+        });
+      });
+    });
+    //- pre= body
