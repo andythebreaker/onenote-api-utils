@@ -80,5 +80,19 @@ fs.writeFileSync(path.join(jekyllSrc, '_config.yml'), 'title: OneNote Notebook\n
 fs.cpSync(path.join(__dirname, 'assets'), path.join(jekyllSrc, 'assets'), { recursive: true });
 
 // run jekyll build
-child_process.execSync(`jekyll build -s ${jekyllSrc} -d dist`, { stdio: 'inherit' });
+//child_process.execSync(`jekyll build -s ${jekyllSrc} -d dist`, { stdio: 'inherit' });
+
+// (RIGHT) – call the `jekyll` CLI, pointing at your generated source folder
+const cmd = 'jekyll';
+const args = ['build', '-s', jekyllSrc, '-d', 'dist'];
+
+try {
+  // execFileSync avoids an extra shell split step
+  child_process.execFileSync(cmd, args, { stdio: 'inherit' });
+  console.log('Static site generated in ./dist');
+} catch (err) {
+  console.error('Jekyll build failed:', err.message);
+  process.exit(1);
+}
+
 console.log('Static site generated in ./dist');
