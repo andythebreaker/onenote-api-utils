@@ -40,11 +40,13 @@ const layoutContent = `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ page.title }}</title>
+  <link rel="manifest" href="/manifest.json">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui/dist/semantic.min.css">
 </head>
 <body>
-  <div class="ui grid">
+  <div class="ui stackable grid">
     <div class="four wide column">
       <ul>
         {% for section in site.data.sections %}
@@ -65,6 +67,13 @@ const layoutContent = `<!DOCTYPE html>
       </div>
     </div>
   </div>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/service-worker.js');
+      });
+    }
+  </script>
 </body>
 </html>`;
 
@@ -78,6 +87,43 @@ fs.writeFileSync(path.join(jekyllSrc, '_config.yml'), 'title: OneNote Notebook\n
 
 // copy assets
 fs.cpSync(path.join(__dirname, 'assets'), path.join(jekyllSrc, 'assets'), { recursive: true });
+fs.mkdirSync(path.join(jekyllSrc, 'icon'), { recursive: true });
+fs.cpSync(path.join(__dirname, 'icon', 'icon.png'), path.join(jekyllSrc, 'icon', 'icon.png'));
+
+// generate manifest for PWA
+const manifest = {
+  name: 'OneNote Notebook',
+  short_name: 'OneNote',
+  start_url: '/',
+  display: 'standalone',
+  background_color: '#ffffff',
+  theme_color: '#3367D6',
+  icons: [
+    {
+      src: '/icon/icon.png',
+      sizes: '512x512',
+      type: 'image/png'
+    }
+  ]
+};
+fs.writeFileSync(path.join(jekyllSrc, 'manifest.json'), JSON.stringify(manifest, null, 2));
+
+// generate simple service worker for offline support
+const swContent = `const CACHE_NAME = 'onenote-pwa-cache-v1';
+const urlsToCache = ['/', '/index.html'];
+
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
+  );
+});
+
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request).then(response => response || fetch(event.request))
+  );
+});`;
+fs.writeFileSync(path.join(jekyllSrc, 'service-worker.js'), swContent);
 
 /***************這個說明很重要不要刪掉***************
 在codex中要用這個
