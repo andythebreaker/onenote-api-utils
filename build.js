@@ -40,31 +40,59 @@ const layoutContent = `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ page.title }}</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui/dist/semantic.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/semantic-ui/dist/semantic.min.js"></script>
 </head>
 <body>
-  <div class="ui grid">
-    <div class="four wide column">
-      <ul>
-        {% for section in site.data.sections %}
-          <li>
-            <h3>{{ section.sectionInfo.displayName | default: section.sectionInfo.name }}</h3>
-            <ul>
-              {% for page in section.sectionPages %}
-                <li><a href="{{ page.url }}">{{ page.pageInfo.title }}</a></li>
-              {% endfor %}
-            </ul>
-          </li>
-        {% endfor %}
-      </ul>
+  <div class="ui sidebar vertical menu" id="mobileMenu">
+    {% for section in site.data.sections %}
+      <div class="item">
+        <div class="header">{{ section.sectionInfo.displayName | default: section.sectionInfo.name }}</div>
+        <div class="menu">
+          {% for page in section.sectionPages %}
+            <a class="item" href="{{ page.url }}">{{ page.pageInfo.title }}</a>
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  <div class="pusher">
+    <div class="ui top fixed menu mobile only">
+      <a class="item" id="sidebarToggle"><i class="bars icon"></i></a>
+      <div class="header item">{{ page.title }}</div>
     </div>
-    <div class="twelve wide column">
-      <div class="ui segment">
-        <div id="pageContent">{{ content }}</div>
+    <div class="ui container" style="margin-top:3em">
+      <div class="ui grid stackable">
+        <div class="four wide computer five wide tablet column mobile hidden" id="desktopMenu">
+          <div class="ui vertical menu">
+            {% for section in site.data.sections %}
+              <div class="item">
+                <div class="header">{{ section.sectionInfo.displayName | default: section.sectionInfo.name }}</div>
+                <div class="menu">
+                  {% for page in section.sectionPages %}
+                    <a class="item" href="{{ page.url }}">{{ page.pageInfo.title }}</a>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="twelve wide computer eleven wide tablet sixteen wide mobile column">
+          <div class="ui segment">
+            <div id="pageContent">{{ content }}</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+  <script>
+    $('#sidebarToggle').on('click', function() {
+      $('#mobileMenu').sidebar('toggle');
+    });
+  </script>
 </body>
 </html>`;
 
