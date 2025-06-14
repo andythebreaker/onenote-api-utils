@@ -66,21 +66,7 @@ const layoutContent = `<!DOCTYPE html>
     </div>
     <div class="ui container" style="margin-top:3em">
       <div class="ui grid stackable">
-        <div class="four wide computer five wide tablet column mobile hidden" id="desktopMenu">
-          <div class="ui vertical menu">
-            {% for section in site.data.sections %}
-              <div class="item">
-                <div class="header">{{ section.sectionInfo.displayName | default: section.sectionInfo.name }}</div>
-                <div class="menu">
-                  {% for page in section.sectionPages %}
-                    <a class="item" href="{{ page.url }}">{{ page.pageInfo.title }}</a>
-                  {% endfor %}
-                </div>
-              </div>
-            {% endfor %}
-          </div>
-        </div>
-        <div class="twelve wide computer eleven wide tablet sixteen wide mobile column">
+        <div class="sixteen wide column">
           <div class="ui segment">
             <div id="pageContent">{{ content }}</div>
           </div>
