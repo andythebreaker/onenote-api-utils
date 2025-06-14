@@ -2,48 +2,59 @@
 <html>
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>OneNote Notebook Content</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui/dist/semantic.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/semantic-ui/dist/semantic.min.js"></script>
+  <style>
+    body { margin: 0; }
+    .toc.ui.sidebar { width: 260px; }
+    @media only screen and (min-width:768px){
+      .toc.ui.sidebar{position:static !important;transform:none !important;visibility:visible !important;}
+      .pusher{margin-left:260px;}
+      #menuToggle{display:none;}
+    }
+  </style>
 </head>
 <body>
-  <div class="ui grid">
-    <div class="four wide column">
-      <ul>
-        <% sectionCollection.forEach(function(section, sIndex){ %>
-          <li>
-            <h3><%= section.sectionInfo.displayName || section.sectionInfo.name %></h3>
-            <ul>
-              <% section.sectionPages.forEach(function(page, pIndex){ %>
-                <li>
-                  <a href="#" data-section="<%= sIndex %>" data-page="<%= pIndex %>"><%= page.pageInfo.title %></a>
-                </li>
-              <% }) %>
-            </ul>
-          </li>
-        <% }) %>
-      </ul>
-    </div>
-    <div class="twelve wide column">
-      <div class="ui segment">
-        <h2>Page Content</h2>
-        <div id="pageContent"><%- firstPageContent %></div>
+  <div class="ui left vertical inverted sidebar menu toc">
+    <% sectionCollection.forEach(function(section, sIndex){ %>
+      <div class="item">
+        <div class="header"><%= section.sectionInfo.displayName || section.sectionInfo.name %></div>
+        <div class="menu">
+          <% section.sectionPages.forEach(function(page, pIndex){ %>
+            <a href="#" class="item" data-section="<%= sIndex %>" data-page="<%= pIndex %>"><%= page.pageInfo.title %></a>
+          <% }) %>
+        </div>
       </div>
+    <% }) %>
+  </div>
+  <div class="pusher">
+    <div class="ui top attached menu">
+      <a class="item" id="menuToggle"><i class="sidebar icon"></i></a>
+      <div class="header item">OneNote</div>
+    </div>
+    <div class="ui container" style="margin-top:1em;">
+      <h2>Page Content</h2>
+      <div id="pageContent"><%- firstPageContent %></div>
     </div>
   </div>
   <script>
-  const sectionCollection = <%- JSON.stringify(sectionCollection) %>;
-  document.addEventListener('DOMContentLoaded', function(){
-    const links = document.querySelectorAll('a[data-section][data-page]');
-    links.forEach(function(link){
+    $('#menuToggle').on('click', function(){
+      $('.ui.sidebar').sidebar('toggle');
+    });
+    const sectionCollection = <%- JSON.stringify(sectionCollection) %>;
+    document.querySelectorAll('a[data-section][data-page]').forEach(function(link){
       link.addEventListener('click', function(ev){
         ev.preventDefault();
         const s = this.getAttribute('data-section');
         const p = this.getAttribute('data-page');
         const html = sectionCollection[s].sectionPages[p].pageBody;
         document.getElementById('pageContent').innerHTML = html;
+        if(window.innerWidth < 768){ $('.ui.sidebar').sidebar('hide'); }
       });
     });
-  });
   </script>
 </body>
 </html>
