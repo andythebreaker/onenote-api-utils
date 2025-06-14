@@ -40,8 +40,12 @@ const layoutContent = `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#3f51b5">
   <title>{{ page.title }}</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui/dist/semantic.min.css">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icon/icon.png">
 </head>
 <body>
   <div class="ui grid">
@@ -65,6 +69,11 @@ const layoutContent = `<!DOCTYPE html>
       </div>
     </div>
   </div>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js');
+    }
+  </script>
 </body>
 </html>`;
 
@@ -78,6 +87,43 @@ fs.writeFileSync(path.join(jekyllSrc, '_config.yml'), 'title: OneNote Notebook\n
 
 // copy assets
 fs.cpSync(path.join(__dirname, 'assets'), path.join(jekyllSrc, 'assets'), { recursive: true });
+fs.cpSync(path.join(__dirname, 'icon'), path.join(jekyllSrc, 'icon'), { recursive: true });
+
+// generate manifest.json for PWA
+const manifest = {
+  name: 'OneNote Notebook',
+  short_name: 'Notebook',
+  start_url: '/',
+  display: 'standalone',
+  background_color: '#ffffff',
+  theme_color: '#3f51b5',
+  icons: [
+    {
+      src: '/icon/icon.png',
+      sizes: '512x512',
+      type: 'image/png'
+    }
+  ]
+};
+fs.writeFileSync(path.join(jekyllSrc, 'manifest.json'), JSON.stringify(manifest, null, 2));
+
+// generate basic service worker for offline support
+const swContent = `self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open('v1').then(cache => cache.addAll([
+      '/',
+      '/manifest.json',
+      '/icon/icon.png'
+    ]))
+  );
+});
+
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request).then(resp => resp || fetch(event.request))
+  );
+});`;
+fs.writeFileSync(path.join(jekyllSrc, 'sw.js'), swContent);
 
 /***************這個說明很重要不要刪掉***************
 在codex中要用這個

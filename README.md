@@ -32,8 +32,11 @@
 2. 找出欲讀取筆記本的ID後，設定至`ONENOTE_NOTEBOOK_ID`環境變數
 3. 執行`node ./src/tests/fetchNotebook.js [--min N]`讀取筆記本內容，並將對應的章節內容儲存至`./notebook_data/`中 (N 為間隔分鐘，0 表示僅執行一次，預設 5 分鐘)
 4. 執行`npm run serv`啟動簡易瀏覽伺服器，於瀏覽器開啟 `http://localhost:3000` 查看筆記內容
-5. 如需產生靜態網頁，執行`npm run build`，產生的網站會在`./dist`目錄中
+5. 如需產生靜態網頁，執行`npm run build`，產生的網站會在`./dist`目錄中，
+   此版本已支援 [PWA](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps) 與
+   [RWD](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Responsive)
 
 ## 資料格式的參考
 
-可以去看`./document_example_of_input_and_output_format`這個資料夾裡面的各種檔案，這是我真實去跑一次生成的資料，只是把他從原本的地方移過來放著。供參考。
+可以參考 `./document_example_of_input_and_output_format` 目錄中的各種檔案，
+這些都是實際執行程式後產生的資料，僅將原始位置搬移到此供參考。
